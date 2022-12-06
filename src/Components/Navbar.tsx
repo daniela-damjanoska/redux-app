@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -28,7 +28,9 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const avatarUrl = localStorage.getItem("avatar");
+  const userFirstName = localStorage.getItem("userFirstName");
   const navigate = useNavigate();
+  // const location = useLocation();
 
   const handleClose = () => setAnchorEl(null);
 
@@ -40,7 +42,8 @@ const Navbar: React.FC = () => {
       <AppBar position="static" sx={{ backgroundColor: "primary.light" }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={styles.toolbarTypo}>
-            Welcome
+            {/* Welcome {location.state.userFirstName} */}
+            Welcome {userFirstName}
           </Typography>
           <IconButton
             size="large"

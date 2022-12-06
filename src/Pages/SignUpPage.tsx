@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import useHandleInputValue from "../Hooks/useHandleInputValue";
+import axios from "axios";
 
 import SignInSignUpWrapper from "../Components/SignInSignUpWrapper";
 import TextInput from "../Components/TextInput";
@@ -23,14 +24,23 @@ const SignUpPage: React.FC = () => {
   const getEmailSuccess = (value: boolean | null) => (emailSuccess = value);
   const getPassSuccess = (value: boolean | null) => (passSuccess = value);
 
-  const fetchAvatarAndNavigate = () => {
-    fetch("https://randomuser.me/api")
-      .then((data) => data.json())
-      .then((data) =>
-        localStorage.setItem("avatar", data.results[0].picture.thumbnail)
-      )
-      .then(() => navigate("/Blog"))
-      .catch((err) => alert(err.message));
+  const fetchAvatarAndNavigate = async () => {
+    try {
+      const response = await axios.get("https://randomuser.me/api");
+      localStorage.setItem(
+        "avatar",
+        response.data.results[0].picture.thumbnail
+      );
+
+      localStorage.setItem("userFirstName", firstName);
+      navigate("/Blog", {
+        state: {
+          userFirstName: firstName,
+        },
+      });
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

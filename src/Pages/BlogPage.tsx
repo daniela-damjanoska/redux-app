@@ -1,5 +1,12 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import useFetch from "../Hooks/useFetch";
+import { useSelector, useDispatch } from "react-redux";
+import { IBlogCard } from "../Components/BlogCard";
+import {
+  blogItemsFilteredByQuery,
+  allblogItemsShown,
+  blogItemDeleted,
+} from "../Features/BlogItems/blogItemsSlice";
 
 import Navbar from "../Components/Navbar";
 import Search from "../Components/Search";
@@ -27,34 +34,37 @@ const styles = {
   },
 };
 
+const selectBlogItems = (state: any) => state.blogItems;
+
 const Blog: React.FC = () => {
   const [searchValue, setSearchValue] = useState<string>(""),
     [id, setId] = useState<number | string>(""),
     [isFiltering, setIsFiltering] = useState<boolean>(false);
 
   const matches = useMediaQuery("(min-width:768px)");
+  const dispatch = useDispatch();
 
-  const [data, loading, error, setData] = useFetch<DataArr>(
+  const [data, loading, error] = useFetch<DataArr>(
     "http://jsonplaceholder.typicode.com/posts/?_limit=20",
     []
   );
+
+  const blogItems = useSelector(selectBlogItems);
 
   useEffect(() => {
     searchValue === "" ? setIsFiltering(false) : setIsFiltering(true);
   }, [searchValue]);
 
   useEffect(() => {
-    const filteredBlogs = data.filter((el) => el.id !== id);
-    setData(filteredBlogs);
-  }, [id, data, setData]);
+    if (isFiltering) dispatch(blogItemsFilteredByQuery(searchValue));
+    else dispatch(allblogItemsShown());
+    //eslint-disable-next-line
+  }, [isFiltering]); // dispatch, searchValue -> eslint
 
-  const dataToRender = useMemo(() => {
-    if (!isFiltering) return data;
-
-    return data.filter(
-      (el) => el.title.includes(searchValue) || el.body.includes(searchValue)
-    );
-  }, [isFiltering, searchValue, data]);
+  useEffect(() => {
+    if (typeof id === "number") dispatch(blogItemDeleted(id));
+    //eslint-disable-next-line
+  }, [id]); // dispatch -> eslint
 
   const getSearchValue = useCallback(
     (value: string) => setSearchValue(value),
@@ -89,17 +99,28 @@ const Blog: React.FC = () => {
         >
           <Search onSearch={getSearchValue} isFiltering={isFiltering} />
           <Grid container spacing={4}>
-            {dataToRender.map(({ id, title, body }) => (
-              <Grid item xs={12} lg={6} key={id}>
-                <BlogCard
-                  title={title}
-                  desc={body}
-                  id={id}
-                  onGetId={getBlogId}
-                />
-              </Grid>
-            ))}
-            {isFiltering && dataToRender.length === 0 && (
+            {isFiltering
+              ? blogItems.filteredBlogItems.map((item: IBlogCard) => (
+                  <Grid item xs={12} lg={6} key={item.id}>
+                    <BlogCard
+                      title={item.title}
+                      body={item.body}
+                      id={item.id}
+                      onGetId={getBlogId}
+                    />
+                  </Grid>
+                ))
+              : blogItems.blogItems.map((item: IBlogCard) => (
+                  <Grid item xs={12} lg={6} key={item.id}>
+                    <BlogCard
+                      title={item.title}
+                      body={item.body}
+                      id={item.id}
+                      onGetId={getBlogId}
+                    />
+                  </Grid>
+                ))}
+            {isFiltering && blogItems.filteredBlogItems.length === 0 && (
               <Typography
                 variant="body2"
                 component="div"

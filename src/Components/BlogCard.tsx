@@ -7,9 +7,9 @@ import Typography from "@mui/material/Typography";
 import { CardActionArea } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-interface IBlogCard {
+export interface IBlogCard {
   title: string;
-  desc: string;
+  body: string;
   id: number;
   onGetId: (id: number) => void;
 }
@@ -26,13 +26,13 @@ const styles = {
   },
 };
 
-const BlogCard: React.FC<IBlogCard> = ({ title, desc, id, onGetId }) => {
+const BlogCard: React.FC<IBlogCard> = ({ title, body, id, onGetId }) => {
   return (
     <Card sx={{ position: "relative" }}>
       <CardActionArea>
         <CardMedia
           component="img"
-          height="140"
+          height="180"
           image="./images/blog.jpg"
           alt="blog-item"
         />
@@ -41,7 +41,7 @@ const BlogCard: React.FC<IBlogCard> = ({ title, desc, id, onGetId }) => {
             {title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {desc}
+            {body}
           </Typography>
           <DeleteOutlineIcon
             onClick={() => onGetId(id)}
