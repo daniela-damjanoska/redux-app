@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import useFetch from "../Hooks/useFetch";
 import { useSelector, useDispatch } from "react-redux";
 import { IBlogCard } from "../Components/BlogCard";
@@ -34,22 +34,23 @@ const styles = {
   },
 };
 
-const selectBlogItems = (state: any) => state.blogItems;
-
-const Blog: React.FC = () => {
+const BlogPage: React.FC = () => {
   const [searchValue, setSearchValue] = useState<string>(""),
     [id, setId] = useState<number | string>(""),
     [isFiltering, setIsFiltering] = useState<boolean>(false);
 
-  const matches = useMediaQuery("(min-width:768px)");
-  const dispatch = useDispatch();
+  const matches = useMediaQuery("(min-width:768px)"),
+    dispatch = useDispatch();
+
+  const blogItems = useSelector((state: any) => state.blogItems.blogItems),
+    filteredItems = useSelector(
+      (state: any) => state.blogItems.filteredBlogItems
+    ); //selector function
 
   const [data, loading, error] = useFetch<DataArr>(
     "http://jsonplaceholder.typicode.com/posts/?_limit=20",
     []
   );
-
-  const blogItems = useSelector(selectBlogItems);
 
   useEffect(() => {
     searchValue === "" ? setIsFiltering(false) : setIsFiltering(true);
@@ -66,12 +67,8 @@ const Blog: React.FC = () => {
     //eslint-disable-next-line
   }, [id]); // dispatch -> eslint
 
-  const getSearchValue = useCallback(
-    (value: string) => setSearchValue(value),
-    []
-  );
-
-  const getBlogId = useCallback((id: number) => setId(id), []);
+  const getSearchValue = (value: string) => setSearchValue(value),
+    getBlogId = (id: number) => setId(id);
 
   if (error) {
     return (
@@ -100,7 +97,7 @@ const Blog: React.FC = () => {
           <Search onSearch={getSearchValue} isFiltering={isFiltering} />
           <Grid container spacing={4}>
             {isFiltering
-              ? blogItems.filteredBlogItems.map((item: IBlogCard) => (
+              ? filteredItems.map((item: IBlogCard) => (
                   <Grid item xs={12} lg={6} key={item.id}>
                     <BlogCard
                       title={item.title}
@@ -110,7 +107,7 @@ const Blog: React.FC = () => {
                     />
                   </Grid>
                 ))
-              : blogItems.blogItems.map((item: IBlogCard) => (
+              : blogItems.map((item: IBlogCard) => (
                   <Grid item xs={12} lg={6} key={item.id}>
                     <BlogCard
                       title={item.title}
@@ -120,7 +117,7 @@ const Blog: React.FC = () => {
                     />
                   </Grid>
                 ))}
-            {isFiltering && blogItems.filteredBlogItems.length === 0 && (
+            {isFiltering && filteredItems.length === 0 && (
               <Typography
                 variant="body2"
                 component="div"
@@ -142,4 +139,4 @@ const Blog: React.FC = () => {
   );
 };
 
-export default Blog;
+export default BlogPage;

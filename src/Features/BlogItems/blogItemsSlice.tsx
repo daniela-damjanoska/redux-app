@@ -65,8 +65,8 @@ export default function blogItemsReducer(
         ...state,
         filteredBlogItems: state.filteredBlogItems.filter(
           (item) =>
-            item.title.includes(action.payload) ||
-            item.body.includes(action.payload)
+            item.title.toLowerCase().includes(action.payload.toLowerCase()) ||
+            item.body.toLowerCase().includes(action.payload.toLowerCase())
         ),
       };
     }

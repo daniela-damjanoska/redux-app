@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ChangeEvent } from "react";
+import React, { useState, ChangeEvent } from "react";
 
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -18,10 +18,8 @@ const styles = {
 const Search: React.FC<ISearch> = ({ onSearch, isFiltering }) => {
   const [value, setValue] = useState<string>("");
 
-  const handleValue = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value),
-    []
-  );
+  const handleValue = (e: ChangeEvent<HTMLInputElement>) =>
+    setValue(e.target.value);
 
   return (
     <Box sx={styles.box}>
