@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import useFetch from "../Hooks/useFetch";
 import { useSelector, useDispatch } from "react-redux";
 import { IBlogCard } from "../Components/BlogCard";
 import {
   blogItemsFilteredByQuery,
   allblogItemsShown,
   blogItemDeleted,
+  deleteBlogItem,
 } from "../Features/BlogItems/blogItemsSlice";
+import store from "../store";
 
 import Navbar from "../Components/Navbar";
 import Search from "../Components/Search";
@@ -16,14 +17,6 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
-interface IDataItem {
-  id: number;
-  title: string;
-  body: string;
-}
-
-type DataArr = IDataItem[];
 
 const styles = {
   boxHeight: { height: "70vh" },
@@ -45,12 +38,9 @@ const BlogPage: React.FC = () => {
   const blogItems = useSelector((state: any) => state.blogItems.blogItems),
     filteredItems = useSelector(
       (state: any) => state.blogItems.filteredBlogItems
-    ); //selector function
-
-  const [data, loading, error] = useFetch<DataArr>(
-    "http://jsonplaceholder.typicode.com/posts/?_limit=20",
-    []
-  );
+    ),
+    loading = useSelector((state: any) => state.blogItems.loading),
+    error = useSelector((state: any) => state.blogItems.error); //selector function
 
   useEffect(() => {
     searchValue === "" ? setIsFiltering(false) : setIsFiltering(true);
@@ -64,6 +54,10 @@ const BlogPage: React.FC = () => {
 
   useEffect(() => {
     if (typeof id === "number") dispatch(blogItemDeleted(id));
+
+    //option with axios:
+    // @ts-ignore
+    if (typeof id === "number") store.dispatch(deleteBlogItem(id));
     //eslint-disable-next-line
   }, [id]); // dispatch -> eslint
 
@@ -97,7 +91,7 @@ const BlogPage: React.FC = () => {
           <Search onSearch={getSearchValue} isFiltering={isFiltering} />
           <Grid container spacing={4}>
             {isFiltering
-              ? filteredItems.map((item: IBlogCard) => (
+              ? filteredItems?.map((item: IBlogCard) => (
                   <Grid item xs={12} lg={6} key={item.id}>
                     <BlogCard
                       title={item.title}
@@ -107,7 +101,7 @@ const BlogPage: React.FC = () => {
                     />
                   </Grid>
                 ))
-              : blogItems.map((item: IBlogCard) => (
+              : blogItems?.map((item: IBlogCard) => (
                   <Grid item xs={12} lg={6} key={item.id}>
                     <BlogCard
                       title={item.title}
@@ -117,7 +111,7 @@ const BlogPage: React.FC = () => {
                     />
                   </Grid>
                 ))}
-            {isFiltering && filteredItems.length === 0 && (
+            {isFiltering && filteredItems?.length === 0 && (
               <Typography
                 variant="body2"
                 component="div"

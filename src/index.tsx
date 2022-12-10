@@ -5,6 +5,10 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import store from "./store";
+import { fetchBlogItems } from "./Features/BlogItems/blogItemsSlice";
+
+// @ts-ignore
+store.dispatch(fetchBlogItems);
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

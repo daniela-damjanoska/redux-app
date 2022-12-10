@@ -1,58 +1,26 @@
+import axios from "axios";
+
+enum fetchData {
+  request = "FETCH_DATA_REQUEST",
+  success = "FETCH_DATA_SUCCESS",
+  error = "FETCH_DATA_ERROR",
+}
+
 const initialState = {
-  blogItems: [
-    {
-      userId: 1,
-      id: 1,
-      title:
-        "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-      body: "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto",
-    },
-    {
-      userId: 1,
-      id: 2,
-      title: "qui est esse",
-      body: "est rerum tempore vitae\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\nqui aperiam non debitis possimus qui neque nisi nulla",
-    },
-    {
-      userId: 1,
-      id: 3,
-      title: "ea molestias quasi exercitationem repellat qui ipsa sit aut",
-      body: "et iusto sed quo iure\nvoluptatem occaecati omnis eligendi aut ad\nvoluptatem doloribus vel accusantium quis pariatur\nmolestiae porro eius odio et labore et velit aut",
-    },
-    {
-      userId: 1,
-      id: 4,
-      title: "eum et est occaecati",
-      body: "ullam et saepe reiciendis voluptatem adipisci\nsit amet autem assumenda provident rerum culpa\nquis hic commodi nesciunt rem tenetur doloremque ipsam iure\nquis sunt voluptatem rerum illo velit",
-    },
-  ],
-  filteredBlogItems: [
-    {
-      userId: 1,
-      id: 1,
-      title:
-        "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-      body: "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto",
-    },
-    {
-      userId: 1,
-      id: 2,
-      title: "qui est esse",
-      body: "est rerum tempore vitae\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\nqui aperiam non debitis possimus qui neque nisi nulla",
-    },
-    {
-      userId: 1,
-      id: 3,
-      title: "ea molestias quasi exercitationem repellat qui ipsa sit aut",
-      body: "et iusto sed quo iure\nvoluptatem occaecati omnis eligendi aut ad\nvoluptatem doloribus vel accusantium quis pariatur\nmolestiae porro eius odio et labore et velit aut",
-    },
-    {
-      userId: 1,
-      id: 4,
-      title: "eum et est occaecati",
-      body: "ullam et saepe reiciendis voluptatem adipisci\nsit amet autem assumenda provident rerum culpa\nquis hic commodi nesciunt rem tenetur doloremque ipsam iure\nquis sunt voluptatem rerum illo velit",
-    },
-  ],
+  loading: false,
+  blogItems: [] as {
+    userId: number;
+    id: number;
+    title: string;
+    body: string;
+  }[],
+  filteredBlogItems: [] as {
+    userId: number;
+    id: number;
+    title: string;
+    body: string;
+  }[],
+  error: null,
 };
 
 export default function blogItemsReducer(
@@ -60,6 +28,24 @@ export default function blogItemsReducer(
   action: { type: string; payload?: any }
 ) {
   switch (action.type) {
+    case fetchData.request:
+      return {
+        ...state,
+        loading: true,
+      };
+    case fetchData.success:
+      return {
+        ...state,
+        loading: false,
+        blogItems: action.payload,
+        filteredBlogItems: action.payload,
+      };
+    case fetchData.error:
+      return {
+        ...state,
+        loading: false,
+        error: true,
+      };
     case "blogItems/filteredByQuery": {
       return {
         ...state,
@@ -98,6 +84,25 @@ export default function blogItemsReducer(
 }
 
 //actions
+export const fetchDataRequest = () => {
+  return {
+    type: fetchData.request,
+  };
+};
+
+export const fetchDataSuccess = (data: []) => {
+  return {
+    type: fetchData.success,
+    payload: data,
+  };
+};
+
+export const fetchDataError = () => {
+  return {
+    type: fetchData.error,
+  };
+};
+
 export const blogItemsFilteredByQuery = (query: string) => ({
   type: "blogItems/filteredByQuery",
   payload: query,
@@ -116,3 +121,31 @@ export const blogItemDeleted = (blogId: number) => ({
   type: "blogItems/blogItemDeleted",
   payload: blogId,
 });
+
+// Thunk functions
+export async function fetchBlogItems(dispatch: any) {
+  dispatch(fetchDataRequest());
+  try {
+    const response = await axios.get(
+      "http://jsonplaceholder.typicode.com/posts/?_limit=20"
+    );
+    dispatch(fetchDataSuccess(response.data));
+  } catch (error) {
+    dispatch(fetchDataError());
+  }
+}
+
+// Sending the id to the server in order to delete the blogItem that is clicked ??????????
+export function deleteBlogItem(blogId: number) {
+  return async function deleteBlogItemThunk(dispatch: any, getState: any) {
+    await axios.delete(`url/${blogId}`);
+
+    dispatch(fetchDataRequest());
+    try {
+      const response = await axios.get("url");
+      dispatch(fetchDataSuccess(response.data));
+    } catch (error) {
+      dispatch(fetchDataError());
+    }
+  };
+}
