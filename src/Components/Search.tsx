@@ -1,4 +1,9 @@
 import React, { useState, ChangeEvent } from "react";
+import {
+  blogItemsFilteredByQuery,
+  filteredItemsNull,
+} from "../Features/BlogItems/blogItemsSlice";
+import { useDispatch } from "react-redux";
 
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -16,7 +21,8 @@ const styles = {
 };
 
 const Search: React.FC<ISearch> = ({ onSearch, isFiltering }) => {
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>(""),
+    dispatch = useDispatch();
 
   const handleValue = (e: ChangeEvent<HTMLInputElement>) =>
     setValue(e.target.value);
@@ -42,6 +48,7 @@ const Search: React.FC<ISearch> = ({ onSearch, isFiltering }) => {
           onClick={() => {
             onSearch(value);
             setValue("");
+            dispatch(blogItemsFilteredByQuery(value));
           }}
         >
           SEARCH
@@ -52,6 +59,7 @@ const Search: React.FC<ISearch> = ({ onSearch, isFiltering }) => {
           fullWidth
           onClick={() => {
             onSearch(value);
+            dispatch(filteredItemsNull());
           }}
         >
           BACK TO ALL POSTS

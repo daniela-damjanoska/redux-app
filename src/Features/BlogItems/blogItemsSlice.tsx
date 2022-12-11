@@ -38,7 +38,6 @@ export default function blogItemsReducer(
         ...state,
         loading: false,
         blogItems: action.payload,
-        filteredBlogItems: action.payload,
       };
     case fetchData.error:
       return {
@@ -49,33 +48,23 @@ export default function blogItemsReducer(
     case "blogItems/filteredByQuery": {
       return {
         ...state,
-        filteredBlogItems: state.filteredBlogItems.filter(
+        filteredBlogItems: state.blogItems.filter(
           (item) =>
             item.title.toLowerCase().includes(action.payload.toLowerCase()) ||
             item.body.toLowerCase().includes(action.payload.toLowerCase())
         ),
       };
     }
-    case "blogItems/filteredById": {
+    case "blogItems/filteredItemsNull": {
       return {
         ...state,
-        filteredBlogItems: state.blogItems.filter(
-          (item) => item.id === action.payload
-        ),
-      };
-    }
-    case "blogItems/allItemsShown": {
-      return {
-        ...state,
-        filteredBlogItems: state.blogItems,
+        filteredBlogItems: [],
       };
     }
     case "blogItems/blogItemDeleted": {
       return {
+        ...state,
         blogItems: state.blogItems.filter((item) => item.id !== action.payload),
-        filteredBlogItems: state.blogItems.filter(
-          (item) => item.id !== action.payload
-        ),
       };
     }
     default:
@@ -108,13 +97,8 @@ export const blogItemsFilteredByQuery = (query: string) => ({
   payload: query,
 });
 
-export const blogItemsFilterById = (blogId: number) => ({
-  type: "blogItems/filteredById",
-  payload: blogId,
-});
-
-export const allblogItemsShown = () => ({
-  type: "blogItems/allItemsShown",
+export const filteredItemsNull = () => ({
+  type: "blogItems/filteredItemsNull",
 });
 
 export const blogItemDeleted = (blogId: number) => ({
@@ -137,7 +121,7 @@ export async function fetchBlogItems(dispatch: any) {
 
 // Sending the id to the server in order to delete the blogItem that is clicked ??????????
 export function deleteBlogItem(blogId: number) {
-  return async function deleteBlogItemThunk(dispatch: any, getState: any) {
+  return async function deleteBlogItemThunk(dispatch: any) {
     await axios.delete(`url/${blogId}`);
 
     dispatch(fetchDataRequest());

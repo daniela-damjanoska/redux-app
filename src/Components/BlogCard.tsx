@@ -1,4 +1,7 @@
 import React from "react";
+import { blogItemDeleted } from "../Features/BlogItems/blogItemsSlice";
+import { useDispatch } from "react-redux";
+import store from "../store";
 
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -11,7 +14,6 @@ export interface IBlogCard {
   title: string;
   body: string;
   id: number;
-  onGetId: (id: number) => void;
 }
 
 const styles = {
@@ -26,7 +28,8 @@ const styles = {
   },
 };
 
-const BlogCard: React.FC<IBlogCard> = ({ title, body, id, onGetId }) => {
+const BlogCard: React.FC<IBlogCard> = ({ title, body, id }) => {
+  const dispatch = useDispatch();
   return (
     <Card sx={{ position: "relative" }}>
       <CardActionArea>
@@ -44,7 +47,10 @@ const BlogCard: React.FC<IBlogCard> = ({ title, body, id, onGetId }) => {
             {body}
           </Typography>
           <DeleteOutlineIcon
-            onClick={() => onGetId(id)}
+            onClick={() => dispatch(blogItemDeleted(id))}
+            //option with axios:
+            // @ts-ignore
+            // onClick={() => store.dispatch(deleteBlogItem(id))}
             sx={styles.deleteIcon}
           />
         </CardContent>

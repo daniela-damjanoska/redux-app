@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { IBlogCard } from "../Components/BlogCard";
-import {
-  blogItemsFilteredByQuery,
-  allblogItemsShown,
-  blogItemDeleted,
-  deleteBlogItem,
-} from "../Features/BlogItems/blogItemsSlice";
-import store from "../store";
 
 import Navbar from "../Components/Navbar";
 import Search from "../Components/Search";
@@ -29,11 +22,8 @@ const styles = {
 
 const BlogPage: React.FC = () => {
   const [searchValue, setSearchValue] = useState<string>(""),
-    [id, setId] = useState<number | string>(""),
-    [isFiltering, setIsFiltering] = useState<boolean>(false);
-
-  const matches = useMediaQuery("(min-width:768px)"),
-    dispatch = useDispatch();
+    [isFiltering, setIsFiltering] = useState<boolean>(false),
+    matches = useMediaQuery("(min-width:768px)");
 
   const blogItems = useSelector((state: any) => state.blogItems.blogItems),
     filteredItems = useSelector(
@@ -46,23 +36,7 @@ const BlogPage: React.FC = () => {
     searchValue === "" ? setIsFiltering(false) : setIsFiltering(true);
   }, [searchValue]);
 
-  useEffect(() => {
-    if (isFiltering) dispatch(blogItemsFilteredByQuery(searchValue));
-    else dispatch(allblogItemsShown());
-    //eslint-disable-next-line
-  }, [isFiltering]); // dispatch, searchValue -> eslint
-
-  useEffect(() => {
-    if (typeof id === "number") dispatch(blogItemDeleted(id));
-
-    //option with axios:
-    // @ts-ignore
-    if (typeof id === "number") store.dispatch(deleteBlogItem(id));
-    //eslint-disable-next-line
-  }, [id]); // dispatch -> eslint
-
-  const getSearchValue = (value: string) => setSearchValue(value),
-    getBlogId = (id: number) => setId(id);
+  const getSearchValue = (value: string) => setSearchValue(value);
 
   if (error) {
     return (
@@ -97,7 +71,6 @@ const BlogPage: React.FC = () => {
                       title={item.title}
                       body={item.body}
                       id={item.id}
-                      onGetId={getBlogId}
                     />
                   </Grid>
                 ))
@@ -107,7 +80,6 @@ const BlogPage: React.FC = () => {
                       title={item.title}
                       body={item.body}
                       id={item.id}
-                      onGetId={getBlogId}
                     />
                   </Grid>
                 ))}
