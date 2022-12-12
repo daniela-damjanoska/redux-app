@@ -1,5 +1,4 @@
 import axios from "axios";
-import store from "../../store";
 
 enum fetchData {
   request = "FETCH_DATA_REQUEST",
@@ -116,12 +115,10 @@ export const deleteBlogItem = (blogId: number) => async (dispatch: any) => {
 
   dispatch(fetchDataRequest());
 
-  //@ts-ignore
-  store.dispatch(fetchBlogItems());
-  // try {
-  //   const response = await axios.get("url");
-  //   dispatch(fetchDataSuccess(response.data));
-  // } catch (error) {
-  //   dispatch(fetchDataError());
-  // }
+  try {
+    const response = await axios.get("url");
+    dispatch(fetchDataSuccess(response.data));
+  } catch (error) {
+    dispatch(fetchDataError());
+  }
 };
