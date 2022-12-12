@@ -1,4 +1,5 @@
 import axios from "axios";
+import store from "../../store";
 
 enum fetchData {
   request = "FETCH_DATA_REQUEST",
@@ -72,25 +73,15 @@ export default function blogItemsReducer(
   }
 }
 
-//actions
-export const fetchDataRequest = () => {
-  return {
-    type: fetchData.request,
-  };
-};
+//action creators:
+export const fetchDataRequest = () => ({ type: fetchData.request });
 
-export const fetchDataSuccess = (data: []) => {
-  return {
-    type: fetchData.success,
-    payload: data,
-  };
-};
+export const fetchDataSuccess = (data: []) => ({
+  type: fetchData.success,
+  payload: data,
+});
 
-export const fetchDataError = () => {
-  return {
-    type: fetchData.error,
-  };
-};
+export const fetchDataError = () => ({ type: fetchData.error });
 
 export const blogItemsFilteredByQuery = (query: string) => ({
   type: "blogItems/filteredByQuery",
@@ -107,7 +98,7 @@ export const blogItemDeleted = (blogId: number) => ({
 });
 
 // Thunk functions
-export async function fetchBlogItems(dispatch: any) {
+export const fetchBlogItems = () => async (dispatch: any) => {
   dispatch(fetchDataRequest());
   try {
     const response = await axios.get(
@@ -117,19 +108,20 @@ export async function fetchBlogItems(dispatch: any) {
   } catch (error) {
     dispatch(fetchDataError());
   }
-}
+};
 
-// Sending the id to the server in order to delete the blogItem that is clicked ??????????
-export function deleteBlogItem(blogId: number) {
-  return async function deleteBlogItemThunk(dispatch: any) {
-    await axios.delete(`url/${blogId}`);
+// Sending the id to the server in order to delete the blogItem that is clicked ?????
+export const deleteBlogItem = (blogId: number) => async (dispatch: any) => {
+  await axios.delete(`url/${blogId}`);
 
-    dispatch(fetchDataRequest());
-    try {
-      const response = await axios.get("url");
-      dispatch(fetchDataSuccess(response.data));
-    } catch (error) {
-      dispatch(fetchDataError());
-    }
-  };
-}
+  dispatch(fetchDataRequest());
+
+  //@ts-ignore
+  store.dispatch(fetchBlogItems());
+  // try {
+  //   const response = await axios.get("url");
+  //   dispatch(fetchDataSuccess(response.data));
+  // } catch (error) {
+  //   dispatch(fetchDataError());
+  // }
+};

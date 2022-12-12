@@ -8,7 +8,7 @@ import store from "./store";
 import { fetchBlogItems } from "./Features/BlogItems/blogItemsSlice";
 
 // @ts-ignore
-store.dispatch(fetchBlogItems);
+store.dispatch(fetchBlogItems());
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
