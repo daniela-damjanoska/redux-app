@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { IBlogCard } from "../Components/BlogCard";
+import { fetchBlogItems } from "../Features/BlogItems/blogItemsSlice";
 
 import Navbar from "../Components/Navbar";
 import Search from "../Components/Search";
@@ -12,7 +13,7 @@ import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const styles = {
-  boxHeight: { height: "70vh" },
+  boxHeight: { height: "60vh" },
   img: {
     width: "100%",
     display: "block",
@@ -25,12 +26,11 @@ const BlogPage: React.FC = () => {
     [isFiltering, setIsFiltering] = useState<boolean>(false),
     matches = useMediaQuery("(min-width:768px)");
 
-  const blogItems = useSelector((state: any) => state.blogItems.blogItems),
+  const loadingStatus = useSelector((state: any) => state.blogItems.status),
+    blogItemsArr = useSelector((state: any) => state.blogItems.blogItems),
     filteredItems = useSelector(
       (state: any) => state.blogItems.filteredBlogItems
-    ),
-    loading = useSelector((state: any) => state.blogItems.loading),
-    error = useSelector((state: any) => state.blogItems.error); //selector function
+    );
 
   useEffect(() => {
     searchValue === "" ? setIsFiltering(false) : setIsFiltering(true);
@@ -38,24 +38,18 @@ const BlogPage: React.FC = () => {
 
   const getSearchValue = (value: string) => setSearchValue(value);
 
-  if (error) {
-    return (
-      <>
-        <Navbar />
-        <Typography marginTop={20} textAlign="center">
-          Something went wrong, please try again later!
-        </Typography>
-      </>
-    );
-  }
-
   return (
     <>
       <Navbar />
       <Box sx={styles.boxHeight}>
         <img src="./images/banner.jpg" alt="banner" style={styles.img} />
       </Box>
-      {!loading ? (
+      {loadingStatus === fetchBlogItems.loading && (
+        <Typography textAlign="center" marginTop={5}>
+          Loading...
+        </Typography>
+      )}
+      {loadingStatus === fetchBlogItems.success && (
         <Box
           sx={{
             marginY: 7,
@@ -74,7 +68,7 @@ const BlogPage: React.FC = () => {
                     />
                   </Grid>
                 ))
-              : blogItems?.map((item: IBlogCard) => (
+              : blogItemsArr?.map((item: IBlogCard) => (
                   <Grid item xs={12} lg={6} key={item.id}>
                     <BlogCard
                       title={item.title}
@@ -96,9 +90,10 @@ const BlogPage: React.FC = () => {
             )}
           </Grid>
         </Box>
-      ) : (
-        <Typography textAlign="center" marginTop={5}>
-          Loading...
+      )}
+      {loadingStatus === fetchBlogItems.error && (
+        <Typography marginTop={20} textAlign="center">
+          Something went wrong, please try again later!
         </Typography>
       )}
     </>

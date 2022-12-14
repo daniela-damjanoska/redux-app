@@ -1,13 +1,13 @@
 import axios from "axios";
 
-enum fetchData {
-  request = "FETCH_DATA_REQUEST",
-  success = "FETCH_DATA_SUCCESS",
-  error = "FETCH_DATA_ERROR",
+export enum fetchBlogItems {
+  loading = "loading",
+  success = "succeeded",
+  error = "failed",
 }
 
 const initialState = {
-  loading: false,
+  status: "idle",
   blogItems: [] as {
     userId: number;
     id: number;
@@ -20,7 +20,6 @@ const initialState = {
     title: string;
     body: string;
   }[],
-  error: null,
 };
 
 export default function blogItemsReducer(
@@ -28,22 +27,21 @@ export default function blogItemsReducer(
   action: { type: string; payload?: any }
 ) {
   switch (action.type) {
-    case fetchData.request:
+    case fetchBlogItems.loading:
       return {
         ...state,
-        loading: true,
+        status: fetchBlogItems.loading,
       };
-    case fetchData.success:
+    case fetchBlogItems.success:
       return {
         ...state,
-        loading: false,
+        status: fetchBlogItems.success,
         blogItems: action.payload,
       };
-    case fetchData.error:
+    case fetchBlogItems.error:
       return {
         ...state,
-        loading: false,
-        error: true,
+        status: fetchBlogItems.error,
       };
     case "blogItems/filteredByQuery": {
       return {
@@ -73,14 +71,14 @@ export default function blogItemsReducer(
 }
 
 //action creators:
-export const fetchDataRequest = () => ({ type: fetchData.request });
+export const blogItemsLoading = () => ({ type: fetchBlogItems.loading });
 
-export const fetchDataSuccess = (data: []) => ({
-  type: fetchData.success,
+export const blogItemsLoaded = (data: []) => ({
+  type: fetchBlogItems.success,
   payload: data,
 });
 
-export const fetchDataError = () => ({ type: fetchData.error });
+export const blogItemsFetchingError = () => ({ type: fetchBlogItems.error });
 
 export const blogItemsFilteredByQuery = (query: string) => ({
   type: "blogItems/filteredByQuery",
@@ -97,15 +95,16 @@ export const blogItemDeleted = (blogId: number) => ({
 });
 
 // Thunk functions
-export const fetchBlogItems = () => async (dispatch: any) => {
-  dispatch(fetchDataRequest());
+export const blogItemsFetching = () => async (dispatch: any) => {
+  dispatch(blogItemsLoading());
+
   try {
     const response = await axios.get(
       "http://jsonplaceholder.typicode.com/posts/?_limit=20"
     );
-    dispatch(fetchDataSuccess(response.data));
+    dispatch(blogItemsLoaded(response.data));
   } catch (error) {
-    dispatch(fetchDataError());
+    dispatch(blogItemsFetchingError());
   }
 };
 
@@ -113,12 +112,12 @@ export const fetchBlogItems = () => async (dispatch: any) => {
 export const deleteBlogItem = (blogId: number) => async (dispatch: any) => {
   await axios.delete(`url/${blogId}`);
 
-  dispatch(fetchDataRequest());
+  dispatch(blogItemsLoading());
 
   try {
     const response = await axios.get("url");
-    dispatch(fetchDataSuccess(response.data));
+    dispatch(blogItemsLoaded(response.data));
   } catch (error) {
-    dispatch(fetchDataError());
+    dispatch(blogItemsFetchingError());
   }
 };
