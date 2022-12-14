@@ -19,8 +19,11 @@ const styles = {
     width: 56,
     height: 56,
   },
-  color: {
+  colorLight: {
     color: "primary.main",
+  },
+  colorDark: {
+    backgroundColor: "primary.dark",
   },
 };
 
@@ -39,7 +42,7 @@ const Navbar: React.FC = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: "primary.light" }}>
+      <AppBar position="static" sx={styles.colorDark}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={styles.toolbarTypo}>
             {/* Welcome {location.state.userFirstName} */}
@@ -75,10 +78,10 @@ const Navbar: React.FC = () => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose} sx={styles.color}>
+            <MenuItem onClick={handleClose} sx={styles.colorLight}>
               My account
             </MenuItem>
-            <MenuItem onClick={() => navigate("/")} sx={styles.color}>
+            <MenuItem onClick={() => navigate("/")} sx={styles.colorLight}>
               Sign Out
             </MenuItem>
           </Menu>

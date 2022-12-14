@@ -14,6 +14,7 @@ const theme = createTheme({
     primary: {
       light: pink[300],
       main: pink[600],
+      dark: pink[900],
     },
   },
 });
