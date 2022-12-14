@@ -1,13 +1,14 @@
 import axios from "axios";
 
 export enum fetchBlogItems {
+  idle = "idle",
   loading = "loading",
   success = "succeeded",
   error = "failed",
 }
 
 const initialState = {
-  status: "idle",
+  status: fetchBlogItems.idle,
   blogItems: [] as {
     userId: number;
     id: number;
