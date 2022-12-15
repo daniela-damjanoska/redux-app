@@ -27,6 +27,7 @@ const BlogPage: React.FC = () => {
     matches = useMediaQuery("(min-width:768px)");
 
   const loadingStatus = useSelector((state: any) => state.blogItems.status),
+    error = useSelector((state: any) => state.blogItems.error),
     blogItemsArr = useSelector((state: any) => state.blogItems.blogItems),
     filteredItems = useSelector(
       (state: any) => state.blogItems.filteredBlogItems
@@ -49,7 +50,7 @@ const BlogPage: React.FC = () => {
           Loading...
         </Typography>
       )}
-      {loadingStatus === fetchBlogItems.success && (
+      {loadingStatus === fetchBlogItems.idle && blogItemsArr.length > 0 && (
         <Box
           sx={{
             marginY: 7,
@@ -91,7 +92,7 @@ const BlogPage: React.FC = () => {
           </Grid>
         </Box>
       )}
-      {loadingStatus === fetchBlogItems.error && (
+      {error && (
         <Typography marginTop={20} textAlign="center">
           Something went wrong, please try again later!
         </Typography>

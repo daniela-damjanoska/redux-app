@@ -36,13 +36,15 @@ export default function blogItemsReducer(
     case fetchBlogItems.success:
       return {
         ...state,
-        status: fetchBlogItems.success,
+        status: fetchBlogItems.idle,
         blogItems: action.payload,
       };
     case fetchBlogItems.error:
       return {
         ...state,
-        status: fetchBlogItems.error,
+        status: fetchBlogItems.idle,
+        payload: new Error(),
+        error: true,
       };
     case "blogItems/filteredByQuery": {
       return {
