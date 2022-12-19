@@ -28,16 +28,19 @@ const BlogPage: React.FC = () => {
 
   const loadingStatus = useSelector((state: any) => state.blogItems.status),
     error = useSelector((state: any) => state.blogItems.error),
-    blogItemsArr = useSelector((state: any) => state.blogItems.blogItems),
-    filteredItems = useSelector(
-      (state: any) => state.blogItems.filteredBlogItems
-    );
+    blogItems = useSelector((state: any) => state.blogItems.entities);
 
   useEffect(() => {
     searchValue === "" ? setIsFiltering(false) : setIsFiltering(true);
   }, [searchValue]);
 
   const getSearchValue = (value: string) => setSearchValue(value);
+
+  const filteredItems = blogItems.filter(
+    (item: any) =>
+      item.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+      item.body.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   return (
     <>
@@ -50,7 +53,7 @@ const BlogPage: React.FC = () => {
           Loading...
         </Typography>
       )}
-      {loadingStatus === fetchBlogItems.idle && blogItemsArr.length > 0 && (
+      {loadingStatus === fetchBlogItems.idle && blogItems.length > 0 && (
         <Box
           sx={{
             marginY: 7,
@@ -69,7 +72,7 @@ const BlogPage: React.FC = () => {
                     />
                   </Grid>
                 ))
-              : blogItemsArr?.map((item: IBlogCard) => (
+              : blogItems?.map((item: IBlogCard) => (
                   <Grid item xs={12} lg={6} key={item.id}>
                     <BlogCard
                       title={item.title}

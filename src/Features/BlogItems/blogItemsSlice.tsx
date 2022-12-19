@@ -9,13 +9,7 @@ export enum fetchBlogItems {
 
 const initialState = {
   status: fetchBlogItems.idle,
-  blogItems: [] as {
-    userId: number;
-    id: number;
-    title: string;
-    body: string;
-  }[],
-  filteredBlogItems: [] as {
+  entities: [] as {
     userId: number;
     id: number;
     title: string;
@@ -37,7 +31,7 @@ export default function blogItemsReducer(
       return {
         ...state,
         status: fetchBlogItems.idle,
-        blogItems: action.payload,
+        entities: action.payload,
       };
     case fetchBlogItems.error:
       return {
@@ -46,26 +40,13 @@ export default function blogItemsReducer(
         payload: new Error(),
         error: true,
       };
-    case "blogItems/filteredByQuery": {
-      return {
-        ...state,
-        filteredBlogItems: state.blogItems.filter(
-          (item) =>
-            item.title.toLowerCase().includes(action.payload.toLowerCase()) ||
-            item.body.toLowerCase().includes(action.payload.toLowerCase())
-        ),
-      };
-    }
-    case "blogItems/filteredItemsNull": {
-      return {
-        ...state,
-        filteredBlogItems: [],
-      };
+    case "blogItems/initalState": {
+      return state;
     }
     case "blogItems/blogItemDeleted": {
       return {
         ...state,
-        blogItems: state.blogItems.filter((item) => item.id !== action.payload),
+        entities: state.entities.filter((item) => item.id !== action.payload),
       };
     }
     default:
@@ -88,9 +69,7 @@ export const blogItemsFilteredByQuery = (query: string) => ({
   payload: query,
 });
 
-export const filteredItemsNull = () => ({
-  type: "blogItems/filteredItemsNull",
-});
+export const blogItemsInitial = () => ({ type: "blogItems/initalState" });
 
 export const blogItemDeleted = (blogId: number) => ({
   type: "blogItems/blogItemDeleted",

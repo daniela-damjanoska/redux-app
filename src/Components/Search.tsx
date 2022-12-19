@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent } from "react";
 import {
   blogItemsFilteredByQuery,
-  filteredItemsNull,
+  blogItemsInitial,
 } from "../Features/BlogItems/blogItemsSlice";
 import { useDispatch } from "react-redux";
 
@@ -59,7 +59,7 @@ const Search: React.FC<ISearch> = ({ onSearch, isFiltering }) => {
           fullWidth
           onClick={() => {
             onSearch(value);
-            dispatch(filteredItemsNull());
+            dispatch(blogItemsInitial());
           }}
         >
           BACK TO ALL POSTS
